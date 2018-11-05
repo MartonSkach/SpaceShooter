@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SpaceShooter</title>
+    <style>
+      canvas {
+        position: absolute;
+        margin: 20px;
+        border: 1px solid black;
+        background: transparent;
+      }
+
+      .preload-images {
+        overflow: hidden;
+        height: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preload-images">
+      <img id="back-bg" src="./assets/backbg.png">
+      <img id="front-bg" src="./assets/frontbg.png">
+      <img id="player" src="./assets/player.png">
+      <img id="enemy" src="./assets/enemy.png">
+    </div>
+    <canvas width="800" height="600" class="back-bg"></canvas>
+    <canvas width="800" height="600" class="front-bg"></canvas>
+    <canvas width="800" height="600" class="enemy-area"></canvas>
+    <canvas width="800" height="600" class="player-area"></canvas>
+    <script type="text/typescript" src="main.ts"></script>
+    
+    <script src="https://rawgit.com/Microsoft/TypeScript/master/lib/typescriptServices.js"></script>
+    <script src="https://rawgit.com/basarat/typescript-script/master/transpiler.js"></script>
+  </body>
+</html>

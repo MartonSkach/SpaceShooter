@@ -1,0 +1,9 @@
+.main-canvas {
+  margin: 20px;
+  border: 1px solid black;
+}
+
+.preload-images {
+  visibility: hidden;
+  height: 0;
+}

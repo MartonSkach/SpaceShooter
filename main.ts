@@ -1,7 +1,7 @@
 "use strict";
 
 window.onload = function () {
-  setInterval(update, 1000 / 30)
+  setInterval(update, 1000 / 30);
 }
 
 const backbgCanvas = document.querySelector('.back-bg') as HTMLCanvasElement;
@@ -15,7 +15,9 @@ const eC = enemyCanvas.getContext('2d');
 const backBg = document.getElementById('back-bg') as HTMLImageElement;
 const frontBg = document.getElementById('front-bg') as HTMLImageElement;
 const playerCharacter = document.getElementById('player') as HTMLImageElement;
+const playerLaser = document.getElementById('player-laser') as HTMLImageElement;
 const enemyCharacter = document.getElementById('enemy') as HTMLImageElement;
+const enemyLaser = document.getElementById('enemy-laser') as HTMLImageElement;
 
 document.body.addEventListener('keydown', onKeyPress);
 let backBackgroundPosition1 = 0;
@@ -24,10 +26,11 @@ let frontBackgroundPosition1 = 0;
 let frontBackgroundPosition2 = 800;
 
 function update() {
-  
+
+  // Drawing the slower moving, back layer of the background
   if (backBackgroundPosition1 >= -1600) {
     bbgC.drawImage(backBg, backBackgroundPosition1, 0);
-  } else if (backBackgroundPosition1 <= -1600 && 
+  } else if (backBackgroundPosition1 <= -1600 &&
     backBackgroundPosition1 >= -2400) {
     bbgC.drawImage(backBg, backBackgroundPosition1, 0);
     bbgC.drawImage(backBg, backBackgroundPosition2, 0);
@@ -42,7 +45,7 @@ function update() {
   // Drawing the faster moving, front layer of the background
   if (frontBackgroundPosition1 >= -1600) {
     fbgC.drawImage(frontBg, frontBackgroundPosition1, 0);
-  } else if (frontBackgroundPosition1 <= -1600 && 
+  } else if (frontBackgroundPosition1 <= -1600 &&
     frontBackgroundPosition1 >= -2400) {
     fbgC.drawImage(frontBg, frontBackgroundPosition1, 0);
     fbgC.drawImage(frontBg, frontBackgroundPosition2, 0);
@@ -56,6 +59,10 @@ function update() {
 
   pC.clearRect(0, 0, 800, 600)
   player.createPlayer();
+
+  playerLasers.forEach(element => {
+    element.drawPlayerLaser();
+  });
 }
 
 abstract class gameObjects {
@@ -64,6 +71,36 @@ abstract class gameObjects {
   constructor(type: string, isAlive: boolean) {
     this.type = type;
     this.isAlive = isAlive;
+  }
+}
+
+class PlayerLaser {
+  positionX: number;
+  positionY: number;
+  constructor() {
+    this.positionX = player.positionX + 40;
+    this.positionY = player.positionY + 30;
+  }
+  drawPlayerLaser() {
+    if (this.positionX < 800) {
+      pC.drawImage(playerLaser, this.positionX, this.positionY);
+      this.positionX += 10;
+    }
+  }
+}
+
+class EnemyLaser {
+  positionX: number;
+  positionY: number;
+  constructor() {
+    this.positionX = enemyArray[e].positionX - 40;
+    this.positionY = enemyArray[e].positionY + 30;
+  }
+  drawPlayerLaser() {
+    if (this.positionX > -20) {
+      pC.drawImage(playerLaser, this.positionX, this.positionY);
+      this.positionX -= 10;
+    }
   }
 }
 
@@ -101,6 +138,8 @@ class Player extends gameObjects {
 }
 
 let player = new Player();
+let l: number = 0;
+let playerLasers: any = [];
 
 function onKeyPress(event: KeyboardEvent) {
   switch (event.keyCode) {
@@ -115,6 +154,13 @@ function onKeyPress(event: KeyboardEvent) {
       break;
     case 39:
       player.movementRight();
+      break;
+    case 32:
+      console.log('space');
+      playerLasers.push(`playerLaserElement${l}`);
+      playerLasers[l] = new PlayerLaser();
+      console.log(playerLasers[l]);
+      l++;
       break;
   }
 }

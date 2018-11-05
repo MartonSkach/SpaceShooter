@@ -2,6 +2,8 @@
 
 window.onload = function () {
   setInterval(update, 1000 / 30);
+  setInterval(spawnEnemy, 2000);
+  setInterval(enemyFire, 1000);
 }
 
 const backbgCanvas = document.querySelector('.back-bg') as HTMLCanvasElement;
@@ -24,6 +26,10 @@ let backBackgroundPosition1 = 0;
 let backBackgroundPosition2 = 800;
 let frontBackgroundPosition1 = 0;
 let frontBackgroundPosition2 = 800;
+
+// ----------------------------------------------------------------
+// Auto update functions
+// ----------------------------------------------------------------
 
 function update() {
 
@@ -58,12 +64,39 @@ function update() {
   frontBackgroundPosition1 -= 2.5;
 
   pC.clearRect(0, 0, 800, 600)
+  eC.clearRect(0, 0, 800, 600)
   player.createPlayer();
 
   playerLasers.forEach(element => {
     element.drawPlayerLaser();
   });
+
+  enemies.forEach(element => {
+    element.drawEnemy();
+  });
+  enemyLasers.forEach(element => {
+    element.drawEnemyLaser();
+  });
 }
+
+let e: number = 0;
+let enemies: any = [];
+
+function spawnEnemy() {
+  enemies.push(`enemyShip${e}`);
+  enemies[e] = new Enemy();
+  e++;
+}
+
+function enemyFire() {
+  enemies.forEach(element => {
+    element.fireLaser();
+  });
+}
+
+// ----------------------------------------------------------------
+// Game Objects
+// ----------------------------------------------------------------
 
 abstract class gameObjects {
   type: string;
@@ -74,35 +107,9 @@ abstract class gameObjects {
   }
 }
 
-class PlayerLaser {
-  positionX: number;
-  positionY: number;
-  constructor() {
-    this.positionX = player.positionX + 40;
-    this.positionY = player.positionY + 30;
-  }
-  drawPlayerLaser() {
-    if (this.positionX < 800) {
-      pC.drawImage(playerLaser, this.positionX, this.positionY);
-      this.positionX += 10;
-    }
-  }
-}
-
-class EnemyLaser {
-  positionX: number;
-  positionY: number;
-  constructor() {
-    this.positionX = enemyArray[e].positionX - 40;
-    this.positionY = enemyArray[e].positionY + 30;
-  }
-  drawPlayerLaser() {
-    if (this.positionX > -20) {
-      pC.drawImage(playerLaser, this.positionX, this.positionY);
-      this.positionX -= 10;
-    }
-  }
-}
+// ----------------------------------------------------------------
+// Player Objects
+// ----------------------------------------------------------------
 
 class Player extends gameObjects {
   positionX: number;
@@ -137,9 +144,80 @@ class Player extends gameObjects {
   }
 }
 
+class PlayerLaser {
+  positionX: number;
+  positionY: number;
+  constructor() {
+    this.positionX = player.positionX + 40;
+    this.positionY = player.positionY + 30;
+  }
+  drawPlayerLaser() {
+    if (this.positionX < 800) {
+      pC.drawImage(playerLaser, this.positionX, this.positionY);
+      this.positionX += 10;
+    }
+  }
+}
+
 let player = new Player();
-let l: number = 0;
+let pl: number = 0;
 let playerLasers: any = [];
+
+// ----------------------------------------------------------------
+// Enemy objects
+// ----------------------------------------------------------------
+
+let el: number = 0;
+let enemyLasers: any = [];
+
+class Enemy extends gameObjects {
+  positionX: number;
+  positionY: number;
+  speedX: number;
+  speedY: number;
+  randomizer: number;
+  constructor() {
+    super('Enemy', true);
+    this.positionX = 840;
+    this.positionY = Math.floor(Math.random() * (555 - (-20))) + (-20);
+    this.speedX = Math.random() * (3 - 1) + 1;
+    this.speedY = Math.random() * (1 - 0) + 0;
+    this.randomizer = Math.floor(Math.random() * (100 - 0)) + 0;
+  }
+  drawEnemy() {
+    eC.drawImage(enemyCharacter, this.positionX, this.positionY);
+    this.positionX = this.positionX - this.speedX;
+    if (this.randomizer >= 50) {
+      this.positionY = this.positionY - this.speedY;
+    } else {
+      this.positionY = this.positionY + this.speedY
+    }
+  }
+  fireLaser() {
+    if (this.positionY - player.positionY <= 20 && this.positionY - player.positionY >= -20) {
+      enemyLasers.push(`enemyLaserElement${el}`);
+      enemyLasers[el] = new EnemyLaser(this.positionX, this.positionY);
+      el++;
+    }
+  }
+}
+
+class EnemyLaser {
+  positionX: number;
+  positionY: number;
+  constructor(positionX: number, positionY: number) {
+    this.positionX = positionX - 20;
+    this.positionY = positionY + 20;
+  }
+  drawEnemyLaser() {
+    if (this.positionX > -20) {
+      eC.drawImage(enemyLaser, this.positionX, this.positionY);
+      this.positionX -= 8;
+    }
+  }
+}
+
+// Input controls
 
 function onKeyPress(event: KeyboardEvent) {
   switch (event.keyCode) {
@@ -156,11 +234,9 @@ function onKeyPress(event: KeyboardEvent) {
       player.movementRight();
       break;
     case 32:
-      console.log('space');
-      playerLasers.push(`playerLaserElement${l}`);
-      playerLasers[l] = new PlayerLaser();
-      console.log(playerLasers[l]);
-      l++;
+      playerLasers.push(`playerLaserElement${pl}`);
+      playerLasers[pl] = new PlayerLaser();
+      pl++;
       break;
   }
 }

@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>SpaceShooter</title>
-    <style>
-      canvas {
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceShooter</title>
+  <style>
+    canvas {
         position: absolute;
         margin: 20px;
         border: 1px solid black;
@@ -16,23 +18,27 @@
         height: 0;
       }
     </style>
-  </head>
-  <body>
-    <div class="preload-images">
-      <img id="back-bg" src="./assets/backbg.png">
-      <img id="front-bg" src="./assets/frontbg.png">
-      <img id="player" src="./assets/player.png">
-      <img id="player-laser" src="./assets/player-laser.png">
-      <img id="enemy" src="./assets/enemy.png">
-      <img id="enemy-laser" src="./assets/enemy-laser.png">
-    </div>
-    <canvas width="800" height="600" class="back-bg"></canvas>
-    <canvas width="800" height="600" class="front-bg"></canvas>
-    <canvas width="800" height="600" class="enemy-area"></canvas>
-    <canvas width="800" height="600" class="player-area"></canvas>
-    <script type="text/typescript" src="main.ts"></script>
-    
-    <script src="https://rawgit.com/Microsoft/TypeScript/master/lib/typescriptServices.js"></script>
-    <script src="https://rawgit.com/basarat/typescript-script/master/transpiler.js"></script>
-  </body>
+</head>
+
+<body>
+  <div class="preload-images">
+    <img id="back-bg" src="./assets/backbg.png">
+    <img id="front-bg" src="./assets/frontbg.png">
+    <img id="player" src="./assets/player.png">
+    <img id="player-laser" src="./assets/player-laser.png">
+    <img id="enemy" src="./assets/enemy.png">
+    <img id="enemy-laser" src="./assets/enemy-laser.png">
+    <img id="explosion_sprite" src="./assets/explosion.png">
+  </div>
+  <canvas width="800" height="600" class="back-bg"></canvas>
+  <canvas width="800" height="600" class="front-bg"></canvas>
+  <canvas width="800" height="600" class="enemy-area"></canvas>
+  <canvas width="800" height="600" class="player-area"></canvas>
+  <canvas width="800" height="600" class="explosion-area"></canvas>
+  
+  <script type="text/typescript" src="main.ts"></script>
+  <script src="https://rawgit.com/Microsoft/TypeScript/master/lib/typescriptServices.js"></script>
+  <script src="https://rawgit.com/basarat/typescript-script/master/transpiler.js"></script>
+</body>
+
 </html>

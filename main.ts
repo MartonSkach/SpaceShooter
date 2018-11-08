@@ -2,9 +2,6 @@
 
 window.onload = function () {
   titleScreen();
-  setInterval(update, 1000 / 30);
-  setInterval(spawnEnemy, spawnerSpeed);
-  setInterval(enemyFire, 1000);
 }
 
 const backbgCanvas = document.querySelector('.back-bg') as HTMLCanvasElement;
@@ -25,6 +22,18 @@ const enemyCharacter = document.getElementById('enemy') as HTMLImageElement;
 const enemyLaser = document.getElementById('enemy-laser') as HTMLImageElement;
 const explosionSprite = document.getElementById('explosion_sprite') as HTMLImageElement;
 const title = document.getElementById('title') as HTMLImageElement;
+
+const startButton1 = document.querySelector('#button1') as HTMLBodyElement;
+const startButton2 = document.querySelector('#button2') as HTMLBodyElement;
+const startButton3 = document.querySelector('#button3') as HTMLBodyElement;
+const exitButton = document.querySelector('.exitButton') as HTMLBodyElement;
+const buttonHolder = document.querySelector('.button-holder') as HTMLDivElement;
+startButton1.addEventListener('click', startGame);
+startButton2.addEventListener('click', startGame);
+startButton3.addEventListener('click', startGame);
+exitButton.onclick = function() {
+  location.href = 'https://playerdrivendevelopment.wordpress.com/';
+};
 
 document.body.addEventListener('keydown', onKeyPress);
 let backBackgroundPosition1 = 0;
@@ -47,17 +56,34 @@ function titleScreen() {
 }
 
 function menuScreen() {
-
+  bbgC.clearRect(0, 0, 800, 600);
+  fbgC.clearRect(0, 0, 800, 600);
+  pC.clearRect(0, 0, 800, 600);
+  eC.clearRect(0, 0, 800, 600);
+  explosionC.clearRect(0, 0, 800, 600);
+  bbgC.fillStyle = "#282b47";
+  bbgC.fillRect(0, 0, 800, 600);
+  buttonHolder.style.zIndex = '1';
+  backbgCanvas.style.zIndex = '-1';
+  frontbgCanvas.style.zIndex = '-1';
+  playerCanvas.style.zIndex = '-1';
+  enemyCanvas.style.zIndex = '-1';
+  explosionCanvas.style.zIndex = '-1';
 }
 
 function startGame() {
+  buttonHolder.style.zIndex = '-1';
+  backbgCanvas.style.zIndex = '1';
+  frontbgCanvas.style.zIndex = '1';
+  playerCanvas.style.zIndex = '1';
+  enemyCanvas.style.zIndex = '1';
+  explosionCanvas.style.zIndex = '1';
   setInterval(update, 1000 / 30);
-  setInterval(spawnEnemy, 2000);
+  setInterval(spawnEnemy, spawnerSpeed);
   setInterval(enemyFire, 1000);
 }
 
 function update() {
-
   if (playerPoints >= 50) {
     spawnerSpeed = 500;
   } else if (playerPoints >= 25) {
@@ -68,6 +94,8 @@ function update() {
     explosionC.font = "70px Impact";
     explosionC.fillStyle = '#F4861F';
     explosionC.fillText(`GAME OVER`, 380, 250);
+    explosionC.font = "40px Impact";
+    explosionC.fillText(`Press SPACE to Restart`, 350, 320);
   }
 
   // Drawing the slower moving, back layer of the background
@@ -347,6 +375,8 @@ function onKeyPress(event: KeyboardEvent) {
         playerLasers.push(`playerLaserElement${pl}`);
         playerLasers[pl] = new PlayerLaser();
         pl++;
+      } else {
+        location.reload();
       }
       break;
   }

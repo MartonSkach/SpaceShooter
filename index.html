@@ -7,16 +7,56 @@
   <title>SpaceShooter</title>
   <style>
     canvas {
-        position: absolute;
-        margin: 20px;
-        border: 1px solid black;
-        background: transparent;
-      }
+      position: absolute;
+      border: 1px solid black;
+      background: transparent;
+      z-index: 1;
+    }
 
-      .preload-images {
-        overflow: hidden;
-        height: 0;
-      }
+    .play-area {
+    margin: 20px;
+      position: absolute;
+      border: 1px solid black;
+      background: transparent;
+      height: 600px;
+      width: 800px;
+    }
+
+    .button-holder {
+      width: 800px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: -1;
+    }
+
+    .startButton, .exitButton {
+      width: 300px;
+      height: 60px;
+      background-color: #F4861F;
+      border: none;
+      color: white;
+      padding: 16px 32px;
+      text-align: center;
+      font-size: 16px;
+      margin: 4px 2px;
+      opacity: 0.6;
+      transition: 0.3s;
+      display: inline-block;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .startButton:hover, .exitButton:hover {
+      opacity: 1;
+    }
+
+    .preload-images {
+      overflow: hidden;
+      height: 0;
+    }
     </style>
 </head>
 
@@ -31,11 +71,19 @@
     <img id="explosion_sprite" src="./assets/explosion.png">
     <img id="title" src="./assets/title.png">
   </div>
-  <canvas width="800" height="600" class="back-bg"></canvas>
-  <canvas width="800" height="600" class="front-bg"></canvas>
-  <canvas width="800" height="600" class="enemy-area"></canvas>
-  <canvas width="800" height="600" class="player-area"></canvas>
-  <canvas width="800" height="600" class="explosion-area"></canvas>
+  <div class="play-area">
+    <canvas width="800" height="600" class="back-bg"></canvas>
+    <canvas width="800" height="600" class="front-bg"></canvas>
+    <canvas width="800" height="600" class="enemy-area"></canvas>
+    <canvas width="800" height="600" class="player-area"></canvas>
+    <canvas width="800" height="600" class="explosion-area"></canvas>
+    <div class="button-holder">
+      <input class="startButton" id="button1" type="button" value="Start Game 1" />
+      <input class="startButton" id="button2" type="button" value="Start Game 2" />
+      <input class="startButton" id="button3" type="button" value="Start Game 3" />
+      <input class="exitButton" type="button" value="Exit Game" />
+    </div>
+  </div>
 
   <script type="text/typescript" src="main.ts"></script>
   <script src="https://rawgit.com/Microsoft/TypeScript/master/lib/typescriptServices.js"></script>

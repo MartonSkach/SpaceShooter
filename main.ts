@@ -1,8 +1,9 @@
 "use strict";
 
 window.onload = function () {
+  titleScreen();
   setInterval(update, 1000 / 30);
-  setInterval(spawnEnemy, 2000);
+  setInterval(spawnEnemy, spawnerSpeed);
   setInterval(enemyFire, 1000);
 }
 
@@ -23,6 +24,7 @@ const playerLaser = document.getElementById('player-laser') as HTMLImageElement;
 const enemyCharacter = document.getElementById('enemy') as HTMLImageElement;
 const enemyLaser = document.getElementById('enemy-laser') as HTMLImageElement;
 const explosionSprite = document.getElementById('explosion_sprite') as HTMLImageElement;
+const title = document.getElementById('title') as HTMLImageElement;
 
 document.body.addEventListener('keydown', onKeyPress);
 let backBackgroundPosition1 = 0;
@@ -34,7 +36,39 @@ let frontBackgroundPosition2 = 800;
 // Auto update functions
 // ----------------------------------------------------------------
 
+let spawnerSpeed: number = 2000;
+
+function titleScreen() {
+  explosionC.drawImage(title, 0, 0);
+  setTimeout(function () {
+    explosionC.clearRect(0, 0, 800, 600);
+    menuScreen();
+  }, 2000);
+}
+
+function menuScreen() {
+
+}
+
+function startGame() {
+  setInterval(update, 1000 / 30);
+  setInterval(spawnEnemy, 2000);
+  setInterval(enemyFire, 1000);
+}
+
 function update() {
+
+  if (playerPoints >= 50) {
+    spawnerSpeed = 500;
+  } else if (playerPoints >= 25) {
+    spawnerSpeed = 1000;
+  }
+
+  if (!player.isAlive) {
+    explosionC.font = "70px Impact";
+    explosionC.fillStyle = '#F4861F';
+    explosionC.fillText(`GAME OVER`, 380, 250);
+  }
 
   // Drawing the slower moving, back layer of the background
   if (backBackgroundPosition1 >= -1600) {
@@ -66,9 +100,14 @@ function update() {
   }
   frontBackgroundPosition1 -= 2.5;
 
-  pC.clearRect(0, 0, 800, 600)
-  eC.clearRect(0, 0, 800, 600)
-  player.createPlayer();
+  pC.clearRect(0, 0, 800, 600);
+  eC.clearRect(0, 0, 800, 600);
+  if (player.isAlive) {
+    player.createPlayer();
+  }
+  eC.font = "30px Impact";
+  eC.fillStyle = '#F4861F';
+  eC.fillText(`Invaders destroyed: ${playerPoints}`, 30, 50);
 
   playerLasers.forEach(element => {
     if (element.positionX > 800) {
@@ -80,8 +119,8 @@ function update() {
   });
 
   enemies.forEach(element => {
-    if ((element.positionX <= -20 && element.positionY <= 630) ||
-      (element.positionX <= -20 && element.positionY >= -30)) {
+    if ((element.positionX <= -40 && element.positionY <= 630) ||
+      (element.positionX <= -40 && element.positionY >= -30)) {
       element.isAlive = false
     }
     if (element.isAlive) {
@@ -121,7 +160,7 @@ function enemyFire() {
 function explosion(x: number, y: number, i: number) {
   let LoopCount: number = 8;
   explosionC.drawImage(explosionSprite, i * 64, 0, 64, 64, x, y, 128, 128);
-  setTimeout(function() {
+  setTimeout(function () {
     explosionC.clearRect(0, 0, 800, 600);
   }, 75)
   i++;
@@ -178,18 +217,7 @@ class Player extends gameObjects {
       this.positionX = this.positionX + 5;
     }
   }
-  isAliveCheck() {
-    enemyLasers.forEach(element => {
-      if ((element.positionX - this.positionX >= -50 && element.positionX - this.positionX <= 0) &&
-        (element.positionY - this.positionY >= 0 && element.positionY - this.positionY <= -42) &&
-        element.drawable) {
-        this.isAlive = false;
-        element.drawable = false;
-      }
-    });
-  };
 }
-
 
 let pl: number = 0;
 let playerLasers: any = [];
@@ -202,12 +230,11 @@ class PlayerLaser {
     this.positionX = player.positionX + 40;
     this.positionY = player.positionY + 30;
     this.drawable = true;
-  }
+  };
   drawPlayerLaser() {
     pC.drawImage(playerLaser, this.positionX, this.positionY);
     this.positionX += 10;
   };
-
 }
 
 let player = new Player();
@@ -218,6 +245,7 @@ let player = new Player();
 
 let el: number = 0;
 let enemyLasers: any = [];
+let playerPoints: number = 0;
 
 class Enemy extends gameObjects {
   positionX: number;
@@ -257,12 +285,17 @@ class Enemy extends gameObjects {
         this.isAlive = false;
         element.drawable = false;
         explosion(this.positionX - 40, this.positionY - 40, 0);
+        playerPoints++;
       }
     });
     if ((player.positionX - this.positionX >= -45 && player.positionX - this.positionX <= 55) &&
-      (player.positionY - this.positionY >= -45 && player.positionY - this.positionY <= 20)) {
+      (player.positionY - this.positionY >= -45 && player.positionY - this.positionY <= 20) &&
+      player.isAlive) {
       this.isAlive = false;
       player.isAlive = false;
+      explosion(this.positionX - 40, this.positionY - 40, 0);
+      explosion(player.positionX - 40, player.positionY - 40, 0);
+      playerPoints++;
     }
   }
 }
@@ -282,8 +315,11 @@ class EnemyLaser {
   }
   drawableCheck() {
     if ((this.positionX - player.positionX <= 50 && this.positionX - player.positionX >= 0) &&
-      (this.positionY - player.positionY >= 0 && this.positionY - player.positionY <= 42)) {
+      (this.positionY - player.positionY >= 0 && this.positionY - player.positionY <= 42) &&
+      player.isAlive) {
       this.drawable = false
+      player.isAlive = false;
+      explosion(player.positionX - 40, player.positionY - 40, 0);
     }
   }
 }
@@ -307,9 +343,11 @@ function onKeyPress(event: KeyboardEvent) {
       player.movementRight();
       break;
     case 32:
-      playerLasers.push(`playerLaserElement${pl}`);
-      playerLasers[pl] = new PlayerLaser();
-      pl++;
+      if (player.isAlive) {
+        playerLasers.push(`playerLaserElement${pl}`);
+        playerLasers[pl] = new PlayerLaser();
+        pl++;
+      }
       break;
   }
 }

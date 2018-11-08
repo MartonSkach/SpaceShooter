@@ -94,8 +94,8 @@ function update() {
     explosionC.font = "70px Impact";
     explosionC.fillStyle = '#F4861F';
     explosionC.fillText(`GAME OVER`, 380, 250);
-    explosionC.font = "40px Impact";
-    explosionC.fillText(`Press SPACE to Restart`, 350, 320);
+    explosionC.font = "30px Impact";
+    explosionC.fillText(`Press SPACE to return to Menu`, 350, 320);
   }
 
   // Drawing the slower moving, back layer of the background

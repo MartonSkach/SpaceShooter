@@ -29,7 +29,6 @@ const startButton3 = document.querySelector('#button3') as HTMLBodyElement;
 const exitButton = document.querySelector('.exitButton') as HTMLBodyElement;
 const buttonHolder = document.querySelector('.button-holder') as HTMLDivElement;
 
-document.body.addEventListener('keydown', onKeyPress);
 let backBackgroundPosition1 = 0;
 let backBackgroundPosition2 = 800;
 let frontBackgroundPosition1 = 0;
@@ -65,23 +64,30 @@ class Player extends gameObjects {
   }
   movementUp() {
     if (this.positionY - 5 > -20) {
-      this.positionY = this.positionY - 5;
+      this.positionY = this.positionY - 4;
     }
   }
   movementDown() {
     if (this.positionY + 5 < 555) {
-      this.positionY = this.positionY + 5;
+      this.positionY = this.positionY + 4;
     }
   }
   movementLeft() {
     if (this.positionX - 5 > -10) {
-      this.positionX = this.positionX - 5;
+      this.positionX = this.positionX - 4;
     }
   }
   movementRight() {
     if (this.positionX + 5 < 755) {
-      this.positionX = this.positionX + 5;
+      this.positionX = this.positionX + 4;
     }
+  }
+  Update() {
+    if (Key.isDown(Key.UP)) this.movementUp();
+    if (Key.isDown(Key.LEFT)) this.movementLeft();
+    if (Key.isDown(Key.DOWN)) this.movementDown();
+    if (Key.isDown(Key.RIGHT)) this.movementRight();
+    if (Key.isDown(Key.SHOOT)) shootLaser();
   }
 }
 
@@ -101,9 +107,12 @@ class PlayerLaser {
 }
 
 function shootLaser() {
-  playerLasers.push(`playerLaserElement${pl}`);
-  playerLasers[pl] = new PlayerLaser();
-  pl++;
+  if (laserAvailable) {
+    playerLasers.push(`playerLaserElement${pl}`);
+    playerLasers[pl] = new PlayerLaser();
+    pl++;
+    laserAvailable = false;
+  }
 }
 
 // ----------------------------------------------------------------
@@ -196,6 +205,7 @@ let playerLasers: any = [];
 let el: number = 0;
 let enemyLasers: any = [];
 let playerPoints: number = 0;
+let laserAvailable: boolean = true;
 
 // ----------------------------------------------------------------
 // Auto update functions
@@ -238,9 +248,22 @@ function startGame() {
   setInterval(update, 1000 / 30);
   setInterval(spawnEnemy, spawnerSpeed);
   setInterval(enemyFire, 1000);
+  setInterval(checkAmmo, 400);
+}
+
+function reloadWeapon() {
+  laserAvailable = true;
+}
+
+function checkAmmo() {
+  if (!laserAvailable) {
+    setTimeout(reloadWeapon, 400);
+  }
 }
 
 function update() {
+  player.Update();
+
   if (playerPoints >= 50) {
     spawnerSpeed = 500;
   } else if (playerPoints >= 25) {
@@ -355,6 +378,7 @@ function explosion(x: number, y: number, i: number) {
 // Input controls
 // ----------------------------------------------------------------
 
+/*
 function onKeyPress(event: KeyboardEvent) {
   switch (event.keyCode) {
     case 38:
@@ -378,11 +402,56 @@ function onKeyPress(event: KeyboardEvent) {
       break;
   }
 }
+*/
+
+window.addEventListener('keydown', function(event) {
+  switch (event.keyCode) {
+    case 38:
+      player.movementUp();
+      break;
+    case 40:
+      player.movementDown();
+      break;
+    case 37:
+      player.movementLeft();
+      break;
+    case 39:
+      player.movementRight();
+      break;
+    case 82:
+      if (player.isAlive) {
+        shootLaser();
+      } else {
+        location.reload();
+      }
+      break;
+  }
+}, false);
+
+let Key = {
+  _pressed: {},
+
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  SHOOT: 82,
+
+  isDown: function(keyCode) {
+    return this._pressed[keyCode];
+  },
+  onKeydown: function(event) {
+    this._pressed[event.keyCode] = true;
+  },
+  onKeyup: function(event) {
+    delete this._pressed[event.keyCode];
+  }
+};
+
+window.addEventListener('keyup', function(event) { Key.onKeyup(event); }, false);
+window.addEventListener('keydown', function(event) { Key.onKeydown(event); }, false);
 
 startButton1.addEventListener('click', startGame);
-startButton2.addEventListener('click', startGame);
-startButton3.addEventListener('click', startGame);
 exitButton.onclick = function () {
   location.href = 'https://playerdrivendevelopment.wordpress.com/';
 };
-

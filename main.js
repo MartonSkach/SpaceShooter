@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -38,7 +38,6 @@ var startButton2 = document.querySelector('#button2');
 var startButton3 = document.querySelector('#button3');
 var exitButton = document.querySelector('.exitButton');
 var buttonHolder = document.querySelector('.button-holder');
-document.body.addEventListener('keydown', onKeyPress);
 var backBackgroundPosition1 = 0;
 var backBackgroundPosition2 = 800;
 var frontBackgroundPosition1 = 0;
@@ -69,23 +68,35 @@ var Player = /** @class */ (function (_super) {
     };
     Player.prototype.movementUp = function () {
         if (this.positionY - 5 > -20) {
-            this.positionY = this.positionY - 5;
+            this.positionY = this.positionY - 4;
         }
     };
     Player.prototype.movementDown = function () {
         if (this.positionY + 5 < 555) {
-            this.positionY = this.positionY + 5;
+            this.positionY = this.positionY + 4;
         }
     };
     Player.prototype.movementLeft = function () {
         if (this.positionX - 5 > -10) {
-            this.positionX = this.positionX - 5;
+            this.positionX = this.positionX - 4;
         }
     };
     Player.prototype.movementRight = function () {
         if (this.positionX + 5 < 755) {
-            this.positionX = this.positionX + 5;
+            this.positionX = this.positionX + 4;
         }
+    };
+    Player.prototype.Update = function () {
+        if (Key.isDown(Key.UP))
+            this.movementUp();
+        if (Key.isDown(Key.LEFT))
+            this.movementLeft();
+        if (Key.isDown(Key.DOWN))
+            this.movementDown();
+        if (Key.isDown(Key.RIGHT))
+            this.movementRight();
+        if (Key.isDown(Key.SHOOT))
+            shootLaser();
     };
     return Player;
 }(gameObjects));
@@ -104,9 +115,12 @@ var PlayerLaser = /** @class */ (function () {
     return PlayerLaser;
 }());
 function shootLaser() {
-    playerLasers.push("playerLaserElement" + pl);
-    playerLasers[pl] = new PlayerLaser();
-    pl++;
+    if (laserAvailable) {
+        playerLasers.push("playerLaserElement" + pl);
+        playerLasers[pl] = new PlayerLaser();
+        pl++;
+        laserAvailable = false;
+    }
 }
 // ----------------------------------------------------------------
 // Enemy objects
@@ -193,6 +207,7 @@ var playerLasers = [];
 var el = 0;
 var enemyLasers = [];
 var playerPoints = 0;
+var laserAvailable = true;
 // ----------------------------------------------------------------
 // Auto update functions
 // ----------------------------------------------------------------
@@ -231,8 +246,18 @@ function startGame() {
     setInterval(update, 1000 / 30);
     setInterval(spawnEnemy, spawnerSpeed);
     setInterval(enemyFire, 1000);
+    setInterval(checkAmmo, 400);
+}
+function reloadWeapon() {
+    laserAvailable = true;
+}
+function checkAmmo() {
+    if (!laserAvailable) {
+        setTimeout(reloadWeapon, 400);
+    }
 }
 function update() {
+    player.Update();
     if (playerPoints >= 50) {
         spawnerSpeed = 500;
     }
@@ -341,7 +366,32 @@ function explosion(x, y, i) {
 // ----------------------------------------------------------------
 // Input controls
 // ----------------------------------------------------------------
-function onKeyPress(event) {
+/*
+function onKeyPress(event: KeyboardEvent) {
+  switch (event.keyCode) {
+    case 38:
+      player.movementUp();
+      break;
+    case 40:
+      player.movementDown();
+      break;
+    case 37:
+      player.movementLeft();
+      break;
+    case 39:
+      player.movementRight();
+      break;
+    case 82:
+      if (player.isAlive) {
+        shootLaser();
+      } else {
+        location.reload();
+      }
+      break;
+  }
+}
+*/
+window.addEventListener('keydown', function (event) {
     switch (event.keyCode) {
         case 38:
             player.movementUp();
@@ -364,10 +414,27 @@ function onKeyPress(event) {
             }
             break;
     }
-}
+}, false);
+var Key = {
+    _pressed: {},
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    SHOOT: 82,
+    isDown: function (keyCode) {
+        return this._pressed[keyCode];
+    },
+    onKeydown: function (event) {
+        this._pressed[event.keyCode] = true;
+    },
+    onKeyup: function (event) {
+        delete this._pressed[event.keyCode];
+    }
+};
+window.addEventListener('keyup', function (event) { Key.onKeyup(event); }, false);
+window.addEventListener('keydown', function (event) { Key.onKeydown(event); }, false);
 startButton1.addEventListener('click', startGame);
-startButton2.addEventListener('click', startGame);
-startButton3.addEventListener('click', startGame);
 exitButton.onclick = function () {
     location.href = 'https://playerdrivendevelopment.wordpress.com/';
 };
